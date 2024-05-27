@@ -12,8 +12,7 @@ import { useEffect, useState } from "react";
 import SimpleBar from "simplebar-react";
 
 import { useMode } from "#/components/global/theme-registry";
-import { updateBoard } from "#/server/boards";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 const widgets_cards = [
   {

@@ -35,7 +35,7 @@ import Figures from "#/layout/Trades/tools/figures";
 import Lineup from "#/layout/Trades/tools/lineup";
 import Lines from "#/layout/Trades/tools/lines";
 import Cuts from "#/layout/Trades/tools/cuts";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 registerLocale("ru", {
   time: "Время：",

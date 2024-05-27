@@ -10,7 +10,7 @@ import Card from "@mui/material/Card";
 import Chart from "react-apexcharts";
 
 import useFormat from "#/utils/format-thousands";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function CoinVolume({ data, isLoading, handleDeleteWidget }) {
   const theme = useTheme();

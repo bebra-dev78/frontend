@@ -19,7 +19,7 @@ import moment from "moment";
 
 import useFormat from "#/utils/format-thousands";
 import { useUser } from "#/app/my/layout";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 function ProfitItem({ data, today, last24Hours, isLoading }) {
   const [current, diff, series] = useMemo(() => {
@@ -908,9 +908,11 @@ export default function GridLayoutItems() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/overview`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/overview`, {
+      method: "GET",
       headers: {
-        "X-ABOBA-UID": user.id,
+        "Content-Type": "application/json",
+        "X-TRADIFY-UID": user.id,
       },
     })
       .then((res) => res.json())

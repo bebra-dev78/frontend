@@ -13,7 +13,7 @@ import { keyframes } from "@emotion/react";
 import { useState } from "react";
 
 import { useMode } from "#/components/global/theme-registry";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Settings({ stretch, setStretch, sx }) {
   const { mode, setMode } = useMode();

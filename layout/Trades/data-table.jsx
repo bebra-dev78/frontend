@@ -42,10 +42,9 @@ import { DateTime } from "luxon";
 import Image from "next/image";
 
 import { useMode } from "#/components/global/theme-registry";
-import { updateTags, updateRating } from "#/server/trades";
 import { useKeys, useUser } from "#/app/my/layout";
 import useFormat from "#/utils/format-thousands";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 import overlay from "#/public/svg/illustration_empty_content.svg";
 
@@ -529,12 +528,14 @@ const DataTable = memo(function DataTable({ setActivate, setHidden, apiRef }) {
   useEffect(() => {
     setLoading(true);
     fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/table?page=${
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/table?page=${
         paginationModel.page + 1
       }&pageSize=${paginationModel.pageSize}`,
       {
+        method: "GET",
         headers: {
-          "X-ABOBA-UID": user.id,
+          "Content-Type": "application/json",
+          "X-TRADIFY-UID": user.id,
         },
       }
     )

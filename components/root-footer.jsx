@@ -3,14 +3,14 @@ import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 
-import LinkToPolicy from "#/components/other/footer-link-to-policy";
+import Link from "next/link";
+
 import AppLogo from "#/components/app-logo";
 
 export default function RootFooter() {
   return (
-    <Box component="footer">
+    <footer>
       <Divider />
       <Container sx={{ pt: "40px" }}>
         <Grid
@@ -85,7 +85,17 @@ export default function RootFooter() {
                 <Typography variant="overline" color="text.primary">
                   Правовая информация
                 </Typography>
-                <LinkToPolicy />
+                <Link href="/privacy-policy">
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    Политика конфиденциальности
+                  </Typography>
+                </Link>
               </Stack>
               <Stack
                 gap={2}
@@ -115,6 +125,6 @@ export default function RootFooter() {
           </Grid>
         </Grid>
       </Container>
-    </Box>
+    </footer>
   );
 }

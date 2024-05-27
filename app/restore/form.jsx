@@ -13,7 +13,7 @@ import NProgress from "nprogress";
 import Script from "next/script";
 import axios from "axios";
 
-import ErrorIcon from "#/components/other/error-icon";
+import ErrorIcon from "#/components/error-icon";
 
 export default function Form() {
   const { status } = useSession();

@@ -9,7 +9,7 @@ import Card from "@mui/material/Card";
 
 import Chart from "react-apexcharts";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function DistributionBySide({
   data,

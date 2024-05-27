@@ -2,7 +2,7 @@
 
 import ListItemButton from "@mui/material/ListItemButton";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Lineup({ addOverlay }) {
   return (

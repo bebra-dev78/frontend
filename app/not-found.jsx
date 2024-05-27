@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import Script from "next/script";
 
 import RootSecondaryHeader from "#/components/root-secondary-header";
-import BackButton from "#/components/other/back-button";
+import BackButton from "#/components/back-button";
 
 export const metadata = {
   title: "Страница не найдена | Tradify",

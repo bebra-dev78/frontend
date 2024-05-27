@@ -8,8 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 import TabsContent from "#/layout/Account/tabs-content";
-import IconBox from "#/components/other/icon-box";
-import Iconify from "#/utils/iconify";
+import IconBox from "#/components/icon-box";
+import Iconify from "#/components/iconify";
 
 export default function TabsWrapper() {
   const [value, setValue] = useState(0);

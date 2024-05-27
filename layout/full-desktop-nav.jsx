@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import Drawer from "@mui/material/Drawer";
 
 import NavPaper from "#/layout/nav-paper";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function FullDesktopNav({
   setOpenSidebar,

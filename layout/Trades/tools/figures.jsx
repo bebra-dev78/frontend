@@ -11,7 +11,7 @@ import Grow from "@mui/material/Grow";
 
 import { useState } from "react";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Figures({ addOverlay }) {
   const [anchorEl, setAnchorEl] = useState(null);

@@ -12,7 +12,7 @@ import { DateTime } from "luxon";
 import { useMemo } from "react";
 import moment from "moment";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function ProfitByTags({ data, isLoading, handleDeleteWidget }) {
   const theme = useTheme();

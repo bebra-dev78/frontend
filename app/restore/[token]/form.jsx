@@ -14,7 +14,7 @@ import { start } from "nprogress";
 import axios from "axios";
 
 import AlertSnackbar from "#/components/alert-snackbar";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Form({ token, email }) {
   const router = useRouter();

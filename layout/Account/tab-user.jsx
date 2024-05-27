@@ -17,10 +17,9 @@ import Box from "@mui/material/Box";
 import { useState, useRef } from "react";
 import Image from "next/image";
 
-import { updateUser, updatePrivate, updateConvert } from "#/server/users";
 import AlertSnackbar from "#/components/alert-snackbar";
+import Iconify from "#/components/iconify";
 import { useUser } from "#/app/my/layout";
-import Iconify from "#/utils/iconify";
 
 import en from "#/public/svg/en.svg";
 import ru from "#/public/svg/ru.svg";
@@ -72,7 +71,18 @@ function PrivateItem() {
         setPrivateMode((prev) => {
           const n = !prev;
           setUser((prev) => ({ ...prev, private: n }));
-          updatePrivate(user.id, n);
+          fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=private&value=${
+              n ? 1 : 0
+            }`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "X-TRADIFY-UID": user.id,
+              },
+            }
+          );
           return n;
         });
       }}
@@ -100,7 +110,18 @@ function ConvertItem() {
         setConvertMode((prev) => {
           const n = !prev;
           setUser((prev) => ({ ...prev, convert: n }));
-          updateConvert(user.id, n);
+          fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=convert&value=${
+              n ? 1 : 0
+            }`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "X-TRADIFY-UID": user.id,
+              },
+            }
+          );
           return n;
         });
       }}
@@ -186,8 +207,8 @@ function EditItem() {
     }
 
     switch (true) {
-      case surname.length > 16:
-        surnameMessage = "Не более 16 символов";
+      case surname.length > 20:
+        surnameMessage = "Не более 20 символов";
         break;
       case /\s/.test(surname):
         surnameMessage = "Фамилия не должна содержать пробелы";
@@ -197,8 +218,8 @@ function EditItem() {
     }
 
     switch (true) {
-      case publicName.length > 16:
-        publicNameMessage = "Не более 16 символов";
+      case publicName.length > 30:
+        publicNameMessage = "Не более 30 символов";
         break;
       case /\s/.test(publicName):
         publicNameMessage = "Публичное имя не должно содержать пробелы";
@@ -221,20 +242,32 @@ function EditItem() {
 
     setLoading(true);
 
-    updateUser(user.id, name, surname, publicName).then((r) => {
-      setLoading(false);
-      if (r === 200) {
-        setUser((prev) => ({ ...prev, name, surname, public: publicName }));
-        setStatusSnackbar({
-          show: true,
-          variant: "success",
-        });
-      } else if (r === 409) {
-        setPublicNameError("Такое публичное имя уже существует");
-      } else {
-        setStatusSnackbar({ show: true, variant: "error" });
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?name=${name}&surname=${surname}&public=${publicName}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-TRADIFY-UID": user.id,
+        },
       }
-    });
+    )
+      .then((res) => res.json())
+      .then((r) => {
+        console.log("r: ", r);
+        setLoading(false);
+        if (r === 200) {
+          setUser((prev) => ({ ...prev, name, surname, public: publicName }));
+          setStatusSnackbar({
+            show: true,
+            variant: "success",
+          });
+        } else if (r === 409) {
+          setPublicNameError("Такое публичное имя уже существует");
+        } else {
+          setStatusSnackbar({ show: true, variant: "error" });
+        }
+      });
   }
 
   return (

@@ -6,7 +6,6 @@ import Stack from "@mui/material/Stack";
 
 import { useState } from "react";
 
-import { createBoard } from "#/server/boards";
 import { useUser } from "#/app/my/layout";
 
 export default function AddBoardMenu({

@@ -14,8 +14,8 @@ import { signIn } from "next-auth/react";
 import { start } from "nprogress";
 
 import NProgressLink from "#/components/nprogress-link";
-import ErrorIcon from "#/components/other/error-icon";
-import Iconify from "#/utils/iconify";
+import ErrorIcon from "#/components/error-icon";
+import Iconify from "#/components/iconify";
 
 export default function Form() {
   const router = useRouter();

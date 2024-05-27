@@ -11,7 +11,7 @@ import { signOut } from "next-auth/react";
 import { start } from "nprogress";
 import Link from "next/link";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function HeaderPopoverMenu({ username, email, setAnchorEl }) {
   const pathname = usePathname();

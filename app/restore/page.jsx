@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 
 import RootSecondaryHeader from "#/components/root-secondary-header";
 import NProgressLink from "#/components/nprogress-link";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 import Form from "#/app/restore/form";
 
 export const metadata = {

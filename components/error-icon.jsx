@@ -1,7 +1,7 @@
 "use client";
 
 import { useMode } from "#/components/global/theme-registry";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function ErrorIcon() {
   const { mode } = useMode();

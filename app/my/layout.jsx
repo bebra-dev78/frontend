@@ -6,7 +6,6 @@ import { useState, useLayoutEffect, useContext, createContext } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-import { getNotifications } from "#/server/notifications";
 import FullDesktopNav from "#/layout/full-desktop-nav";
 import MiniDesktopNav from "#/layout/mini-desktop-nav";
 import Header from "#/layout/header";
@@ -39,11 +38,22 @@ export default function MyLayout({ children }) {
         } else {
           setUser(data[0]);
           setKeys(data[1]);
-          getNotifications(data[0].id).then((r) => {
-            setNotifications(
-              r.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications`, {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": data[0].id,
+            },
+          })
+            .then((res) => res.json())
+            .then((r) =>
+              setNotifications(
+                r.sort(
+                  (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                )
+              )
             );
-          });
         }
       });
     setOpenSidebar(JSON.parse(localStorage.getItem("sidebar")) ?? true);

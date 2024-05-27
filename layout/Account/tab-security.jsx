@@ -13,9 +13,8 @@ import { useState, useRef } from "react";
 import bcrypt from "bcryptjs";
 
 import AlertSnackbar from "#/components/alert-snackbar";
-import { updatePassword } from "#/server/users";
+import Iconify from "#/components/iconify";
 import { useUser } from "#/app/my/layout";
-import Iconify from "#/utils/iconify";
 
 function Form() {
   const { user, setUser } = useUser();
@@ -86,28 +85,39 @@ function Form() {
 
     const hash = bcrypt.hashSync(newPassword, 10);
 
-    updatePassword(user.id, hash).then((r) => {
-      setLoading(false);
-
-      if (r === 200) {
-        setStatusSnackbar({ show: true, variant: "success" });
-        setUser((prev) => ({ ...prev, password: hash }));
-        setOldPasswordError("");
-        setNewPasswordError("");
-        setRepeatPasswordError("");
-
-        userPasswordRef.current = hash;
-
-        repeatPasswordRef.current.value = "";
-        newPasswordRef.current.value = "";
-        oldPasswordRef.current.value = newPassword;
-
-        setShowOldPassword(false);
-        setShowNewPassword(false);
-      } else {
-        setStatusSnackbar({ show: true, variant: "error" });
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=password&value=${hash}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-TRADIFY-UID": user.id,
+        },
       }
-    });
+    )
+      .then((res) => res.json())
+      .then((r) => {
+        setLoading(false);
+
+        if (r === 200) {
+          setStatusSnackbar({ show: true, variant: "success" });
+          setUser((prev) => ({ ...prev, password: hash }));
+          setOldPasswordError("");
+          setNewPasswordError("");
+          setRepeatPasswordError("");
+
+          userPasswordRef.current = hash;
+
+          repeatPasswordRef.current.value = "";
+          newPasswordRef.current.value = "";
+          oldPasswordRef.current.value = newPassword;
+
+          setShowOldPassword(false);
+          setShowNewPassword(false);
+        } else {
+          setStatusSnackbar({ show: true, variant: "error" });
+        }
+      });
   }
 
   return (

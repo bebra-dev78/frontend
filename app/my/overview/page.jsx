@@ -13,7 +13,7 @@ import GridLayoutItems from "#/layout/Overview/grid-layout-items";
 import WelcomeItem from "#/layout/Overview/welcome-item";
 import NProgressLink from "#/components/nprogress-link";
 import ElapsedTime from "#/utils/elapsed-time";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 import woman_2 from "#/public/images/woman_2.png";
 

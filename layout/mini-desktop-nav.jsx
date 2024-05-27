@@ -14,9 +14,9 @@ import { useState, memo } from "react";
 import { start } from "nprogress";
 import Link from "next/link";
 
-import IconBox from "#/components/other/icon-box";
+import IconBox from "#/components/icon-box";
 import AppLogo from "#/components/app-logo";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 const navLinks = [
   { path: "/my/overview", label: "Главная", iconUrl: "/svg/overview.svg" },

@@ -1,8 +1,6 @@
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-import prisma from "#/utils/prisma";
-
 export const authConfig = {
   providers: [
     Credentials({
@@ -18,12 +16,17 @@ export const authConfig = {
         },
       },
       authorize: (credentials) =>
-        prisma.users
-          .findUnique({
-            where: {
-              email: credentials.email,
+        fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?email=${credentials.email}`,
+          {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+              "Content-Type": "application/json",
             },
-          })
+          }
+        )
+          .then((res) => res.json())
           .then((u) =>
             u === null
               ? null

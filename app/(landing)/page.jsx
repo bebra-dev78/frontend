@@ -15,7 +15,7 @@ import NProgressLink from "#/components/nprogress-link";
 import MainButtons from "#/app/(landing)/link-buttons";
 import OverlayBox from "#/app/(landing)/overlay-box";
 import AppLogo from "#/components/app-logo";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 import versatility from "#/public/svg/versatility.svg";
 import complexity from "#/public/svg/complexity.svg";

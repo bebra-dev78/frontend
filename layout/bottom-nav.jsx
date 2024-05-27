@@ -8,7 +8,7 @@ import { start } from "nprogress";
 import Link from "next/link";
 
 import { useMode } from "#/components/global/theme-registry";
-import IconBox from "#/components/other/icon-box";
+import IconBox from "#/components/icon-box";
 
 const navLinks = [
   { path: "/my/overview", label: "Главная", iconUrl: "/svg/overview.svg" },

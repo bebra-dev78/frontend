@@ -13,9 +13,8 @@ import { useRouter } from "next/navigation";
 import { start } from "nprogress";
 import bcrypt from "bcryptjs";
 
-import ErrorIcon from "#/components/other/error-icon";
-import { createUser } from "#/server/users";
-import Iconify from "#/utils/iconify";
+import ErrorIcon from "#/components/error-icon";
+import Iconify from "#/components/iconify";
 
 export default function Form() {
   const { status } = useSession();
@@ -53,7 +52,7 @@ export default function Form() {
     };
   }, []);
 
-  async function handleSubmit() {
+  function handleSubmit() {
     let nameErrorMessage = "";
     let emailErrorMessage = "";
     let passwordErrorMessage = "";
@@ -114,18 +113,31 @@ export default function Form() {
     setLoading(true);
     setAction(false);
 
-    createUser(email, name, bcrypt.hashSync(password, 10)).then((r) => {
-      setLoading(false);
-      if (r === 200) {
-        signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        });
-      } else {
-        setAction(true);
-      }
-    });
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        password: bcrypt.hashSync(password, 10),
+      }),
+    })
+      .then((res) => res.json())
+      .then((r) => {
+        setLoading(false);
+        if (r === 200) {
+          signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+          });
+        } else {
+          setAction(true);
+        }
+      });
   }
 
   return (

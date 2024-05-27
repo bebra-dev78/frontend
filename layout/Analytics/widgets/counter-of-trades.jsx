@@ -16,8 +16,7 @@ import Box from "@mui/material/Box";
 import { useMemo, useState } from "react";
 import { DateTime } from "luxon";
 
-import LineChart from "#/components/global/charts/line";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function СurrentOfTrades({
   data,

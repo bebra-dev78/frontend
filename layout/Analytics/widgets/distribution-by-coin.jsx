@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 import Chart from "react-apexcharts";
 
 import { colors } from "#/utils/apexcharts-config";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function DistributionByCoin({
   data,

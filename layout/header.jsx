@@ -25,12 +25,11 @@ import SimpleBar from "simplebar-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-import { readNotifications, deleteNotification } from "#/server/notifications";
 import HeaderPopoverMenu from "#/components/header-popover-menu";
 import { useMode } from "#/components/global/theme-registry";
 import CounterBox from "#/components/counter-box";
 import Settings from "#/components/settings";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 const MobileMenu = dynamic(() => import("#/layout/mobile-menu"));
 

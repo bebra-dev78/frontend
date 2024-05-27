@@ -25,10 +25,9 @@ import dynamic from "next/dynamic";
 import { DateTime } from "luxon";
 
 import AddBoardMenu from "#/layout/Analytics/add-board-menu";
-import { deleteBoard, updateBoard } from "#/server/boards";
 import CounterBox from "#/components/counter-box";
+import Iconify from "#/components/iconify";
 import { useUser } from "#/app/my/layout";
-import Iconify from "#/utils/iconify";
 
 const CoinVolume = dynamic(() =>
   import("#/layout/Analytics/widgets/coin-volume")
@@ -430,12 +429,14 @@ function GridLayout({
         fetch(
           `${
             process.env.NEXT_PUBLIC_BACKEND_URL
-          }/times?startTime=${DateTime.now()
+          }/trades/times?startTime=${DateTime.now()
             .startOf("day")
             .toMillis()}&endTime=${now}`,
           {
+            method: "GET",
             headers: {
-              "X-ABOBA-UID": user.id,
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
             },
           }
         )
@@ -449,12 +450,14 @@ function GridLayout({
         fetch(
           `${
             process.env.NEXT_PUBLIC_BACKEND_URL
-          }/times?startTime=${DateTime.now()
+          }/trades/times?startTime=${DateTime.now()
             .startOf("week")
             .toMillis()}&endTime=${now}`,
           {
+            method: "GET",
             headers: {
-              "X-ABOBA-UID": user.id,
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
             },
           }
         )
@@ -468,12 +471,14 @@ function GridLayout({
         fetch(
           `${
             process.env.NEXT_PUBLIC_BACKEND_URL
-          }/times?startTime=${DateTime.now()
+          }/trades/times?startTime=${DateTime.now()
             .startOf("month")
             .toMillis()}&endTime=${now}`,
           {
+            method: "GET",
             headers: {
-              "X-ABOBA-UID": user.id,
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
             },
           }
         )
@@ -485,12 +490,14 @@ function GridLayout({
         break;
       case "last-7":
         fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/times?startTime=${
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/times?startTime=${
             now - 604800000
           }&endTime=${now}`,
           {
+            method: "GET",
             headers: {
-              "X-ABOBA-UID": user.id,
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
             },
           }
         )
@@ -502,12 +509,14 @@ function GridLayout({
         break;
       case "last-30":
         fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/times?startTime=${
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/times?startTime=${
             now - 2592000000
           }&endTime=${now}`,
           {
+            method: "GET",
             headers: {
-              "X-ABOBA-UID": user.id,
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
             },
           }
         )
@@ -522,10 +531,12 @@ function GridLayout({
           setLoading(false);
         } else {
           fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/times?startTime=${timeRange[0]}&endTime=${timeRange[1]}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/times?startTime=${timeRange[0]}&endTime=${timeRange[1]}`,
             {
+              method: "GET",
               headers: {
-                "X-ABOBA-UID": user.id,
+                "Content-Type": "application/json",
+                "X-TRADIFY-UID": user.id,
               },
             }
           )

@@ -10,7 +10,7 @@ import RootPrimaryHeader from "#/components/root-primary-header";
 import SmoothAnimation from "#/app/faq/smooth-animation";
 import RootOverlay from "#/components/root-overlay";
 import RootFooter from "#/components/root-footer";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export const metadata = {
   title: "FAQ | Tradify",

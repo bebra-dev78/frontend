@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import { useSession } from "next-auth/react";
 
 import NProgressLink from "#/components/nprogress-link";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function MainButtons() {
   const isBigScreen = useMediaQuery("(min-width:600px)");

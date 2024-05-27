@@ -147,7 +147,7 @@ import Chart from "react-apexcharts";
 import { DateTime } from "luxon";
 import moment from "moment";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function currentOfTrades({
   data,
@@ -1887,7 +1887,7 @@ export default function Index() {
         .toMillis()}&endTime=${current.endOf("month").toMillis()}`,
       {
         headers: {
-          "X-ABOBA-UID": user.id,
+          "X-TRADIFY-UID": user.id,
         },
       }
     )

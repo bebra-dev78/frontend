@@ -30,12 +30,10 @@ import Image from "next/image";
 import axios from "axios";
 
 import { useKeys, useNotifications, useUser } from "#/app/my/layout";
-import { updateTitle, deleteKey, createKey } from "#/server/keys";
 import { useMode } from "#/components/global/theme-registry";
-import { createNotification } from "#/server/notifications";
 import AlertSnackbar from "#/components/alert-snackbar";
 import CounterBox from "#/components/counter-box";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 const EXCHANGES = {
   1: "Binance Futures",

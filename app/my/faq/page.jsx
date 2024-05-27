@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 
 import NProgressLink from "#/components/nprogress-link";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export const metadata = {
   title: "FAQ | Tradify",

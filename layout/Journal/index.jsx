@@ -52,7 +52,7 @@ import useFormat from "#/utils/format-thousands";
 import Lines from "#/layout/Trades/tools/lines";
 import Cuts from "#/layout/Trades/tools/cuts";
 import { useUser } from "#/app/my/layout";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 const KlineChartTreeNode = memo(function KlineChartTreeNode({ trades }) {
   const isSmallScreen = useMediaQuery("(max-width:900px)");
@@ -1759,7 +1759,7 @@ export default function Index() {
 
   useEffect(() => {
     fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/times?startTime=${current
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/trades/times?startTime=${current
         .startOf("month")
         .startOf("week")
         .toMillis()}&endTime=${current
@@ -1767,8 +1767,10 @@ export default function Index() {
         .endOf("week")
         .toMillis()}`,
       {
+        method: "GET",
         headers: {
-          "X-ABOBA-UID": user.id,
+          "Content-Type": "application/json",
+          "X-TRADIFY-UID": user.id,
         },
       }
     )

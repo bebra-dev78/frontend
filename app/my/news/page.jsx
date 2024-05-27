@@ -6,7 +6,7 @@ import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import Box from "@mui/material/Box";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export const metadata = {
   title: "Новости | Tradify",

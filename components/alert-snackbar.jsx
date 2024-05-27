@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Snackbar from "@mui/material/Snackbar";
 import Box from "@mui/material/Box";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function AlertSnackbar({ statusSnackbar, setStatusSnackbar }) {
   switch (statusSnackbar.variant) {

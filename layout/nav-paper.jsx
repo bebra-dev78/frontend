@@ -24,10 +24,10 @@ import crypto from "crypto";
 import axios from "axios";
 
 import { useMode } from "#/components/global/theme-registry";
-import IconBox from "#/components/other/icon-box";
+import IconBox from "#/components/icon-box";
 import AppLogo from "#/components/app-logo";
 import Convert from "#/utils/convert";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 import illustration_docs from "#/public/svg/illustration_docs.svg";
 

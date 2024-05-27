@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export const metadata = {
   title: "Подписка | Tradify",

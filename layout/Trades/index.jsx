@@ -18,8 +18,7 @@ import { useState, useMemo, memo } from "react";
 import { useMode } from "#/components/global/theme-registry";
 import KlinesChart from "#/layout/Trades/klines-chart";
 import DataTable from "#/layout/Trades/data-table";
-import { deleteTrades } from "#/server/trades";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Index() {
   const apiRef = useGridApiRef();

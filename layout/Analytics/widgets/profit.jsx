@@ -10,8 +10,7 @@ import Card from "@mui/material/Card";
 import { DateTime } from "luxon";
 import { useMemo } from "react";
 
-import BarChart from "#/components/global/charts/bar";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function Profit({ data, isLoading, handleDeleteWidget }) {
   const theme = useTheme();

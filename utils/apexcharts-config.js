@@ -40,18 +40,6 @@ export const locales = [
         "Суббота",
       ],
       shortDays: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
-      toolbar: {
-        exportToSVG: "Сохранить SVG",
-        exportToPNG: "Сохранить PNG",
-        exportToCSV: "Сохранить CSV",
-        menu: "Меню",
-        selection: "Выбор",
-        selectionZoom: "Выбор с увеличением",
-        zoomIn: "Увеличить",
-        zoomOut: "Уменьшить",
-        pan: "Перемещение",
-        reset: "Сбросить увеличение",
-      },
     },
   },
 ];

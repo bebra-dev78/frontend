@@ -16,8 +16,7 @@ import Box from "@mui/material/Box";
 import { useMemo, useState } from "react";
 import { DateTime } from "luxon";
 
-import AreaChart from "#/components/global/charts/area";
-import Iconify from "#/utils/iconify";
+import Iconify from "#/components/iconify";
 
 export default function CumulativeCommission({
   data,
