@@ -15,6 +15,7 @@ export async function GET() {
         cache: "no-store",
         headers: {
           "Content-Type": "application/json",
+          Secret: "bebra",
         },
       }
     ).then((res) => res.json());

@@ -10,7 +10,6 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
 import { useState, useRef } from "react";
-import bcrypt from "bcryptjs";
 
 import AlertSnackbar from "#/components/alert-snackbar";
 import Iconify from "#/components/iconify";
@@ -19,35 +18,26 @@ import { useUser } from "#/app/my/layout";
 function Form() {
   const { user, setUser } = useUser();
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [currentPasswordError, setCurrentPasswordError] = useState("");
   const [repeatPasswordError, setRepeatPasswordError] = useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [oldPasswordError, setOldPasswordError] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
   const [statusSnackbar, setStatusSnackbar] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const userPasswordRef = useRef(user.password);
+  const currentPasswordRef = useRef(null);
   const repeatPasswordRef = useRef(null);
   const newPasswordRef = useRef(null);
-  const oldPasswordRef = useRef(null);
 
   function handleSubmit() {
-    let oldPasswordMessage = "";
-    let newPasswordMessage = "";
+    let currentPasswordMessage = "";
     let repeatPasswordMessage = "";
+    let newPasswordMessage = "";
 
+    const currentPassword = currentPasswordRef.current.value;
     const repeatPassword = repeatPasswordRef.current.value;
     const newPassword = newPasswordRef.current.value;
-    const oldPassword = oldPasswordRef.current.value;
-
-    switch (false) {
-      case bcrypt.compareSync(oldPassword, userPasswordRef.current):
-        oldPasswordMessage = "Неверный пароль";
-        break;
-      default:
-        break;
-    }
 
     switch (true) {
       case newPassword.length < 8:
@@ -66,27 +56,25 @@ function Form() {
         repeatPasswordMessage = "Пароли не совпадают";
         newPasswordMessage = "Пароли не совпадают";
         break;
-      case oldPassword.trim() === newPassword.trim():
-        oldPasswordMessage = "Пароли должны отличаться";
+      case currentPassword.trim() === newPassword.trim():
+        currentPasswordMessage = "Пароли должны отличаться";
         newPasswordMessage = "Пароли должны отличаться";
         break;
       default:
         break;
     }
 
-    if (oldPasswordMessage || newPasswordMessage) {
-      setOldPasswordError(oldPasswordMessage);
-      setNewPasswordError(newPasswordMessage);
+    if (currentPasswordMessage || newPasswordMessage) {
+      setCurrentPasswordError(currentPasswordMessage);
       setRepeatPasswordError(repeatPasswordMessage);
+      setNewPasswordError(newPasswordMessage);
       return;
     }
 
     setLoading(true);
 
-    const hash = bcrypt.hashSync(newPassword, 10);
-
     fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=password&value=${hash}`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/password?value=${newPassword}&password=${currentPassword}`,
       {
         method: "PATCH",
         headers: {
@@ -101,19 +89,19 @@ function Form() {
 
         if (r === 200) {
           setStatusSnackbar({ show: true, variant: "success" });
-          setUser((prev) => ({ ...prev, password: hash }));
-          setOldPasswordError("");
-          setNewPasswordError("");
+          setUser((prev) => ({ ...prev, password: newPassword }));
+          setCurrentPasswordError("");
           setRepeatPasswordError("");
+          setNewPasswordError("");
 
-          userPasswordRef.current = hash;
-
+          currentPasswordRef.current.value = newPassword;
           repeatPasswordRef.current.value = "";
           newPasswordRef.current.value = "";
-          oldPasswordRef.current.value = newPassword;
 
-          setShowOldPassword(false);
+          setShowCurrentPassword(false);
           setShowNewPassword(false);
+        } else if (r === 403) {
+          setCurrentPasswordError("Неверный пароль");
         } else {
           setStatusSnackbar({ show: true, variant: "error" });
         }
@@ -125,22 +113,20 @@ function Form() {
       <TextField
         label="Старый пароль"
         name="password"
-        type={showOldPassword ? "text" : "password"}
+        type={showCurrentPassword ? "text" : "password"}
         fullWidth
-        inputRef={oldPasswordRef}
-        onChange={() => {
-          setOldPasswordError("");
-        }}
+        inputRef={currentPasswordRef}
+        onChange={() => setCurrentPasswordError("")}
         InputProps={{
           endAdornment: (
-            <InputAdornment position="end" sx={{ paddingRight: 1 }}>
+            <InputAdornment position="end" sx={{ pr: 1 }}>
               <IconButton
-                onClick={() => setShowOldPassword((prev) => !prev)}
+                onClick={() => setShowCurrentPassword((prev) => !prev)}
                 edge="end"
               >
                 <Iconify
                   icon={
-                    showOldPassword
+                    showCurrentPassword
                       ? "solar:eye-bold"
                       : "solar:eye-closed-bold-duotone"
                   }
@@ -150,8 +136,8 @@ function Form() {
             </InputAdornment>
           ),
         }}
-        error={Boolean(oldPasswordError)}
-        helperText={oldPasswordError}
+        error={Boolean(currentPasswordError)}
+        helperText={currentPasswordError}
       />
       <TextField
         label="Новый пароль"
@@ -160,12 +146,10 @@ function Form() {
         fullWidth
         autoComplete="new-password"
         inputRef={newPasswordRef}
-        onChange={() => {
-          setNewPasswordError("");
-        }}
+        onChange={() => setNewPasswordError("")}
         InputProps={{
           endAdornment: (
-            <InputAdornment position="end" sx={{ paddingRight: 1 }}>
+            <InputAdornment position="end" sx={{ pr: 1 }}>
               <IconButton
                 onClick={() => setShowNewPassword((prev) => !prev)}
                 edge="end"
@@ -191,12 +175,10 @@ function Form() {
         fullWidth
         autoComplete="off"
         inputRef={repeatPasswordRef}
-        onChange={() => {
-          setRepeatPasswordError("");
-        }}
+        onChange={() => setRepeatPasswordError("")}
         InputProps={{
           endAdornment: (
-            <InputAdornment position="end" sx={{ paddingRight: 1 }}>
+            <InputAdornment position="end" sx={{ pr: 1 }}>
               <IconButton
                 onClick={() => setShowNewPassword((prev) => !prev)}
                 edge="end"

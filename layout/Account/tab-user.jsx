@@ -66,13 +66,14 @@ function PrivateItem() {
     <Stack
       flexDirection="row"
       alignItems="center"
+      marginLeft="-11px"
       gap={2}
       onClick={() => {
         setPrivateMode((prev) => {
           const n = !prev;
           setUser((prev) => ({ ...prev, private: n }));
           fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=private&value=${
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/private?v=${
               n ? 1 : 0
             }`,
             {
@@ -105,13 +106,14 @@ function ConvertItem() {
     <Stack
       flexDirection="row"
       alignItems="center"
+      marginLeft="-11px"
       gap={2}
       onClick={() => {
         setConvertMode((prev) => {
           const n = !prev;
           setUser((prev) => ({ ...prev, convert: n }));
           fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?field=convert&value=${
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/convert?v=${
               n ? 1 : 0
             }`,
             {
@@ -193,8 +195,8 @@ function EditItem() {
     const name = nameRef.current.value;
 
     switch (true) {
-      case name.length < 4:
-        nameMessage = "Не менее 4 символов";
+      case name.length < 3:
+        nameMessage = "Не менее 3 символов";
         break;
       case name.length > 16:
         nameMessage = "Не более 16 символов";
@@ -430,7 +432,7 @@ export default function TabUser() {
             height: 180,
           }}
         >
-          <Stack gap={3}>
+          <Stack gap={2}>
             <Typography variant="subtitle2">Приватность</Typography>
             <PrivateItem />
             <Typography variant="caption" color="text.secondary">
@@ -447,7 +449,7 @@ export default function TabUser() {
             height: 180,
           }}
         >
-          <Stack gap={3}>
+          <Stack gap={2}>
             <Typography variant="subtitle2">Валюта</Typography>
             <ConvertItem />
             <Typography variant="caption" color="text.secondary">

@@ -11,7 +11,6 @@ import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { start } from "nprogress";
-import bcrypt from "bcryptjs";
 
 import ErrorIcon from "#/components/error-icon";
 import Iconify from "#/components/iconify";
@@ -40,8 +39,8 @@ export default function Form() {
   const nameRef = useRef(null);
 
   useEffect(() => {
-    function handleKeyPress(event) {
-      if (event.key === "Enter" || event.key === " ") {
+    function handleKeyPress(e) {
+      if (e.key === "Enter" || e.key === " ") {
         handleSubmit();
       }
     }
@@ -62,11 +61,11 @@ export default function Form() {
     const password = passwordRef.current.value;
 
     switch (true) {
-      case name.length < 4:
-        nameErrorMessage = "Не менее 4 символов";
+      case name.length < 3:
+        nameErrorMessage = "Не менее 3 символов";
         break;
       case name.length > 16:
-        nameErrorMessage = "Не более 10 символов";
+        nameErrorMessage = "Не более 16 символов";
         break;
       case /\s/.test(name):
         nameErrorMessage = "Имя не должно содержать пробелы";
@@ -113,18 +112,16 @@ export default function Form() {
     setLoading(true);
     setAction(false);
 
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        name,
-        password: bcrypt.hashSync(password, 10),
-      }),
-    })
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users?name=${name}&email=${email}&password=${password}`,
+      {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((res) => res.json())
       .then((r) => {
         setLoading(false);

@@ -567,43 +567,28 @@ export default function ThemeRegistry({ children }) {
           MuiSwitch: {
             styleOverrides: {
               root: {
-                width: 28,
-                height: 16,
-                padding: "0px",
-                display: "flex",
-                "&:active": {
-                  "& .MuiSwitch-thumb": {
-                    width: 15,
-                  },
-                  "& .MuiSwitch-switchBase.Mui-checked": {
-                    transform: "translateX(9px)",
-                  },
-                },
+                padding: "9px 13px",
                 "& .MuiSwitch-switchBase": {
-                  padding: 2,
+                  left: "5px",
+                  padding: "12px",
                   "&.Mui-checked": {
                     transform: "translateX(12px)",
                     color: "#fff",
                     "& + .MuiSwitch-track": {
-                      opacity: 1,
                       backgroundColor: "rgb(142, 51, 255)",
+                      opacity: 1,
                     },
                   },
                 },
                 "& .MuiSwitch-thumb": {
-                  boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
-                  width: 12,
-                  height: 12,
-                  borderRadius: 6,
                   transition: "width 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+                  height: 13,
+                  width: 12,
                 },
                 "& .MuiSwitch-track": {
-                  borderRadius: 16 / 2,
+                  backgroundColor: "rgba(145, 158, 171, 0.48)",
+                  borderRadius: "14px",
                   opacity: 1,
-                  backgroundColor: dark
-                    ? "rgba(255,255,255,.35)"
-                    : "rgba(0,0,0,.25)",
-                  boxSizing: "border-box",
                 },
               },
             },

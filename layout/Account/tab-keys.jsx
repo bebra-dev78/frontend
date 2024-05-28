@@ -146,335 +146,360 @@ function AddKeyPanel() {
 
     switch (value) {
       case "Binance Futures":
-        createKey(user.id, apikey, secretkey, title, 1).then((k) => {
-          setLoading(false);
-
-          if (k === null) {
-            setApikeyError("Такой ключ уже существует");
-            return;
+        fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/keys?apikey=${apikey}&secretkey=${secretkey}&title=${title}&exchange=1`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-TRADIFY-UID": user.id,
+            },
           }
+        )
+          .then((res) => res.json())
+          .then((k) => {
+            setLoading(false);
 
-          setOpenDialog(false);
-          setStatusSnackbar({ show: true, variant: "info" });
-          setKeys((prev) => [...prev, k]);
+            if (k === null) {
+              setApikeyError("Такой ключ уже существует");
+              return;
+            }
 
-          const serverTime = DateTime.now().ts;
+            setOpenDialog(false);
+            setStatusSnackbar({ show: true, variant: "info" });
+            setKeys((prev) => [...prev, k]);
 
-          var promises = [];
+            const serverTime = DateTime.now().ts;
 
-          for (
-            let start = serverTime - 2592000000 * 24;
-            start < serverTime;
-            start += 432000000
-          ) {
-            const end = Math.min(start + 432000000, serverTime);
+            var promises = [];
 
-            promises.push(
-              axios
-                .get(
-                  `https://fapi.binance.com/fapi/v1/userTrades?startTime=${start}&endTime=${end}&timestamp=${serverTime}&recvWindow=60000&limit=1000&signature=${createHmac(
-                    "sha256",
-                    k.secret_key
-                  )
-                    .update(
-                      `startTime=${start}&endTime=${end}&timestamp=${serverTime}&recvWindow=60000&limit=1000`
+            for (
+              let start = serverTime - 2592000000 * 24;
+              start < serverTime;
+              start += 432000000
+            ) {
+              const end = Math.min(start + 432000000, serverTime);
+
+              promises.push(
+                axios
+                  .get(
+                    `https://fapi.binance.com/fapi/v1/userTrades?startTime=${start}&endTime=${end}&timestamp=${serverTime}&recvWindow=60000&limit=1000&signature=${createHmac(
+                      "sha256",
+                      k.secret_key
                     )
-                    .digest("hex")}`,
-                  {
-                    headers: { "X-MBX-APIKEY": k.api_key },
-                  }
-                )
-                .then((r) => r.data)
-            );
-          }
-
-          Promise.all(promises)
-            .then((deals) => {
-              var aboba = [];
-
-              Object.values(
-                deals.flat().reduce((result, trade) => {
-                  const symbol = trade.symbol;
-                  if (!result[symbol]) {
-                    result[symbol] = [];
-                  }
-                  result[symbol].push(trade);
-                  return result;
-                }, {})
-              ).forEach((deal) => {
-                let currentTrade = [];
-                for (let i = 0; i < deal.length; i++) {
-                  var currentTradeEmpty = currentTrade.length === 0;
-                  var isClosingTrade =
-                    i === deal.length - 1 ||
-                    (i < deal.length - 1 &&
-                      parseFloat(deal[i].realizedPnl) !== 0 &&
-                      parseFloat(deal[i + 1].realizedPnl) === 0);
-                  var isOpeningTrade =
-                    i === 0 ||
-                    (i > 0 &&
-                      parseFloat(deal[i].realizedPnl) === 0 &&
-                      parseFloat(deal[i - 1].realizedPnl) !== 0);
-
-                  if (currentTradeEmpty || isOpeningTrade) {
-                    currentTrade.push(deal[i]);
-                  } else if (isClosingTrade) {
-                    currentTrade.push(deal[i]);
-                    aboba.push([...currentTrade]);
-                    currentTrade = [];
-                  } else {
-                    currentTrade.push(deal[i]);
-                  }
-                }
-              });
-
-              const trades = aboba
-                .map((trade) => {
-                  var deals = [];
-                  var ut = new Set();
-                  var b = trade.filter((t) => t.side === "BUY");
-                  var s = trade.filter((t) => t.side === "SELL");
-                  var bt = b.reduce((a, c) => a + parseFloat(c.qty), 0);
-                  var st = s.reduce((a, c) => a + parseFloat(c.qty), 0);
-                  var bv = b.reduce((a, c) => a + parseFloat(c.quoteQty), 0);
-                  var sv = s.reduce((a, c) => a + parseFloat(c.quoteQty), 0);
-
-                  trade.forEach((t) => {
-                    if (!ut.has(t.time)) {
-                      ut.add(t.time);
-                      deals.push({
-                        time: t.time,
-                        side: t.side,
-                        price: parseFloat(t.price).toFixed(2),
-                        income: parseFloat(t.realizedPnl).toFixed(3),
-                        volume: parseFloat(t.qty + t.price).toFixed(0),
-                        commission: parseFloat(t.commission).toFixed(3),
-                      });
+                      .update(
+                        `startTime=${start}&endTime=${end}&timestamp=${serverTime}&recvWindow=60000&limit=1000`
+                      )
+                      .digest("hex")}`,
+                    {
+                      headers: { "X-MBX-APIKEY": k.api_key },
                     }
-                  });
-
-                  const income = trade.reduce(
-                    (a, c) => a + parseFloat(c.realizedPnl),
-                    0
-                  );
-
-                  const commission = trade.reduce(
-                    (a, d) => a + parseFloat(d.commission),
-                    0
-                  );
-
-                  const profit = parseFloat((income - commission).toFixed(2));
-
-                  return {
-                    uid: user.id,
-                    kid: k.id,
-                    exchange: 1,
-                    symbol: trade[0].symbol,
-                    entry_time: String(trade[0].time),
-                    exit_time: String(trade[trade.length - 1].time),
-                    side: trade[0].side,
-                    avg_entry_price: parseFloat(
-                      (
-                        b.reduce(
-                          (a, c) => a + parseFloat(c.price) * parseFloat(c.qty),
-                          0
-                        ) / bt
-                      ).toFixed(4)
-                    ),
-                    avg_exit_price: parseFloat(
-                      (
-                        s.reduce(
-                          (a, c) => a + parseFloat(c.price) * parseFloat(c.qty),
-                          0
-                        ) / st
-                      ).toFixed(4)
-                    ),
-                    duration: trade[trade.length - 1].time - trade[0].time,
-                    procent: parseFloat(
-                      (((sv / st - bv / bt) / (bv / bt)) * 100).toFixed(2)
-                    ),
-                    income: parseFloat(income.toFixed(3)),
-                    profit:
-                      profit >= 0
-                        ? Math.max(0.01, profit)
-                        : Math.min(-0.01, profit),
-                    turnover: parseFloat(((bt + st) / 2).toFixed(1)),
-                    max_volume: parseFloat(
-                      Math.max(
-                        ...trade.map(
-                          (p) => (parseFloat(p.price) * parseFloat(p.qty)) / 2
-                        )
-                      ).toFixed(1)
-                    ),
-                    volume: parseFloat(
-                      trade
-                        .reduce(
-                          (a, d) => a + parseFloat(d.price) * parseFloat(d.qty),
-                          0
-                        )
-                        .toFixed(2)
-                    ),
-                    commission: parseFloat(commission.toFixed(3)),
-                    transfer: 0,
-                    deals,
-                  };
-                })
-                .sort((a, b) => parseInt(b.entry_time) - parseInt(a.exit_time));
-
-              Promise.all([
-                fetch(
-                  `https://fapi.binance.com/fapi/v2/account?timestamp=${serverTime}&recvWindow=60000&signature=${createHmac(
-                    "sha256",
-                    k.secret_key
                   )
-                    .update(`timestamp=${serverTime}&recvWindow=60000`)
-                    .digest("hex")}`,
-                  {
-                    headers: {
-                      "X-MBX-APIKEY": k.api_key,
-                    },
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((r) => r.totalWalletBalance),
-                fetch(
-                  `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=TRANSFER&startTime=${
-                    serverTime - 2592000000 * 3
-                  }&endTime=${serverTime}&signature=${createHmac(
-                    "sha256",
-                    k.secret_key
-                  )
-                    .update(
-                      `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=TRANSFER&startTime=${
-                        serverTime - 2592000000 * 3
-                      }&endTime=${serverTime}`
-                    )
-                    .digest("hex")}`,
-                  {
-                    headers: {
-                      "X-MBX-APIKEY": k.api_key,
-                    },
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((r) => r.reverse()),
-                fetch(
-                  `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=FUNDING_FEE&startTime=${
-                    serverTime - 2592000000 * 3
-                  }&endTime=${serverTime}&signature=${createHmac(
-                    "sha256",
-                    k.secret_key
-                  )
-                    .update(
-                      `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=FUNDING_FEE&startTime=${
-                        serverTime - 2592000000 * 3
-                      }&endTime=${serverTime}`
-                    )
-                    .digest("hex")}`,
-                  {
-                    headers: {
-                      "X-MBX-APIKEY": k.api_key,
-                    },
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((r) => r.reverse()),
-                fetch(
-                  `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=INTERNAL_TRANSFER&startTime=${
-                    serverTime - 2592000000 * 3
-                  }&endTime=${serverTime}&signature=${createHmac(
-                    "sha256",
-                    k.secret_key
-                  )
-                    .update(
-                      `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=INTERNAL_TRANSFER&startTime=${
-                        serverTime - 2592000000 * 3
-                      }&endTime=${serverTime}`
-                    )
-                    .digest("hex")}`,
-                  {
-                    headers: {
-                      "X-MBX-APIKEY": k.api_key,
-                    },
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((r) => r.reverse()),
-              ]).then((res) => {
-                console.log("res ", res);
+                  .then((r) => r.data)
+              );
+            }
 
-                let balance = parseFloat(res[0]);
+            Promise.all(promises)
+              .then((deals) => {
+                var aboba = [];
 
-                [...res[1], ...res[2], ...res[3]].forEach((transaction) => {
-                  const filteredTrades = trades.filter(
-                    (trade) => parseInt(trade.entry_time) < transaction.time
-                  );
-                  const latestTrade = filteredTrades.reduce(
-                    (maxTrade, currentTrade) => {
-                      return parseInt(currentTrade.entry_time) >
-                        parseInt(maxTrade.entry_time)
-                        ? currentTrade
-                        : maxTrade;
-                    },
-                    filteredTrades[0]
-                  );
+                Object.values(
+                  deals.flat().reduce((result, trade) => {
+                    const symbol = trade.symbol;
+                    if (!result[symbol]) {
+                      result[symbol] = [];
+                    }
+                    result[symbol].push(trade);
+                    return result;
+                  }, {})
+                ).forEach((deal) => {
+                  let currentTrade = [];
+                  for (let i = 0; i < deal.length; i++) {
+                    var currentTradeEmpty = currentTrade.length === 0;
+                    var isClosingTrade =
+                      i === deal.length - 1 ||
+                      (i < deal.length - 1 &&
+                        parseFloat(deal[i].realizedPnl) !== 0 &&
+                        parseFloat(deal[i + 1].realizedPnl) === 0);
+                    var isOpeningTrade =
+                      i === 0 ||
+                      (i > 0 &&
+                        parseFloat(deal[i].realizedPnl) === 0 &&
+                        parseFloat(deal[i - 1].realizedPnl) !== 0);
 
-                  if (latestTrade) {
-                    latestTrade.transfer += parseFloat(transaction.income);
+                    if (currentTradeEmpty || isOpeningTrade) {
+                      currentTrade.push(deal[i]);
+                    } else if (isClosingTrade) {
+                      currentTrade.push(deal[i]);
+                      aboba.push([...currentTrade]);
+                      currentTrade = [];
+                    } else {
+                      currentTrade.push(deal[i]);
+                    }
                   }
                 });
 
-                fetch("/api/aboba", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(
-                    trades.map((p) => {
-                      balance -= p.profit + p.transfer;
+                const trades = aboba
+                  .map((trade) => {
+                    var deals = [];
+                    var ut = new Set();
+                    var b = trade.filter((t) => t.side === "BUY");
+                    var s = trade.filter((t) => t.side === "SELL");
+                    var bt = b.reduce((a, c) => a + parseFloat(c.qty), 0);
+                    var st = s.reduce((a, c) => a + parseFloat(c.qty), 0);
+                    var bv = b.reduce((a, c) => a + parseFloat(c.quoteQty), 0);
+                    var sv = s.reduce((a, c) => a + parseFloat(c.quoteQty), 0);
 
-                      delete p.transfer;
+                    trade.forEach((t) => {
+                      if (!ut.has(t.time)) {
+                        ut.add(t.time);
+                        deals.push({
+                          time: t.time,
+                          side: t.side,
+                          price: parseFloat(t.price).toFixed(2),
+                          income: parseFloat(t.realizedPnl).toFixed(3),
+                          volume: parseFloat(t.qty + t.price).toFixed(0),
+                          commission: parseFloat(t.commission).toFixed(3),
+                        });
+                      }
+                    });
 
-                      return {
-                        ...p,
-                        deposit: Math.max(0, parseInt(balance.toFixed())),
-                      };
-                    })
-                  ),
-                })
-                  .then((res) => res.json())
-                  .then((b) => {
-                    if (b === null) {
-                      createNotification(
-                        user.id,
-                        `Binance Futures: произошла ошибка при сохранении сделок по API-ключу «${k.title}». Попробуйте перезагрузить ключ или обратиться в поддержку.`,
-                        "/svg/error_load.svg"
-                      ).then((n) => {
-                        setNotifications((prev) => [n, ...prev]);
-                      });
-                    } else {
-                      createNotification(
-                        user.id,
-                        `Binance Futures: загружены сделки (${b.count}) по API-ключу «${k.title}».`,
-                        "/svg/success_load.svg"
-                      ).then((n) => {
-                        setNotifications((prev) => [n, ...prev]);
-                      });
+                    const income = trade.reduce(
+                      (a, c) => a + parseFloat(c.realizedPnl),
+                      0
+                    );
+
+                    const commission = trade.reduce(
+                      (a, d) => a + parseFloat(d.commission),
+                      0
+                    );
+
+                    const profit = parseFloat((income - commission).toFixed(2));
+
+                    return {
+                      uid: user.id,
+                      kid: k.id,
+                      exchange: 1,
+                      symbol: trade[0].symbol,
+                      entry_time: String(trade[0].time),
+                      exit_time: String(trade[trade.length - 1].time),
+                      side: trade[0].side,
+                      avg_entry_price: parseFloat(
+                        (
+                          b.reduce(
+                            (a, c) =>
+                              a + parseFloat(c.price) * parseFloat(c.qty),
+                            0
+                          ) / bt
+                        ).toFixed(4)
+                      ),
+                      avg_exit_price: parseFloat(
+                        (
+                          s.reduce(
+                            (a, c) =>
+                              a + parseFloat(c.price) * parseFloat(c.qty),
+                            0
+                          ) / st
+                        ).toFixed(4)
+                      ),
+                      duration: trade[trade.length - 1].time - trade[0].time,
+                      procent: parseFloat(
+                        (((sv / st - bv / bt) / (bv / bt)) * 100).toFixed(2)
+                      ),
+                      income: parseFloat(income.toFixed(3)),
+                      profit:
+                        profit >= 0
+                          ? Math.max(0.01, profit)
+                          : Math.min(-0.01, profit),
+                      turnover: parseFloat(((bt + st) / 2).toFixed(1)),
+                      max_volume: parseFloat(
+                        Math.max(
+                          ...trade.map(
+                            (p) => (parseFloat(p.price) * parseFloat(p.qty)) / 2
+                          )
+                        ).toFixed(1)
+                      ),
+                      volume: parseFloat(
+                        trade
+                          .reduce(
+                            (a, d) =>
+                              a + parseFloat(d.price) * parseFloat(d.qty),
+                            0
+                          )
+                          .toFixed(2)
+                      ),
+                      commission: parseFloat(commission.toFixed(3)),
+                      transfer: 0,
+                      deals,
+                    };
+                  })
+                  .sort(
+                    (a, b) => parseInt(b.entry_time) - parseInt(a.exit_time)
+                  );
+
+                Promise.all([
+                  fetch(
+                    `https://fapi.binance.com/fapi/v2/account?timestamp=${serverTime}&recvWindow=60000&signature=${createHmac(
+                      "sha256",
+                      k.secret_key
+                    )
+                      .update(`timestamp=${serverTime}&recvWindow=60000`)
+                      .digest("hex")}`,
+                    {
+                      headers: {
+                        "X-MBX-APIKEY": k.api_key,
+                      },
+                    }
+                  )
+                    .then((res) => res.json())
+                    .then((r) => r.totalWalletBalance),
+                  fetch(
+                    `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=TRANSFER&startTime=${
+                      serverTime - 2592000000 * 3
+                    }&endTime=${serverTime}&signature=${createHmac(
+                      "sha256",
+                      k.secret_key
+                    )
+                      .update(
+                        `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=TRANSFER&startTime=${
+                          serverTime - 2592000000 * 3
+                        }&endTime=${serverTime}`
+                      )
+                      .digest("hex")}`,
+                    {
+                      headers: {
+                        "X-MBX-APIKEY": k.api_key,
+                      },
+                    }
+                  )
+                    .then((res) => res.json())
+                    .then((r) => r.reverse()),
+                  fetch(
+                    `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=FUNDING_FEE&startTime=${
+                      serverTime - 2592000000 * 3
+                    }&endTime=${serverTime}&signature=${createHmac(
+                      "sha256",
+                      k.secret_key
+                    )
+                      .update(
+                        `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=FUNDING_FEE&startTime=${
+                          serverTime - 2592000000 * 3
+                        }&endTime=${serverTime}`
+                      )
+                      .digest("hex")}`,
+                    {
+                      headers: {
+                        "X-MBX-APIKEY": k.api_key,
+                      },
+                    }
+                  )
+                    .then((res) => res.json())
+                    .then((r) => r.reverse()),
+                  fetch(
+                    `https://fapi.binance.com/fapi/v1/income?timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=INTERNAL_TRANSFER&startTime=${
+                      serverTime - 2592000000 * 3
+                    }&endTime=${serverTime}&signature=${createHmac(
+                      "sha256",
+                      k.secret_key
+                    )
+                      .update(
+                        `timestamp=${serverTime}&recvWindow=60000&limit=1000&incomeType=INTERNAL_TRANSFER&startTime=${
+                          serverTime - 2592000000 * 3
+                        }&endTime=${serverTime}`
+                      )
+                      .digest("hex")}`,
+                    {
+                      headers: {
+                        "X-MBX-APIKEY": k.api_key,
+                      },
+                    }
+                  )
+                    .then((res) => res.json())
+                    .then((r) => r.reverse()),
+                ]).then((res) => {
+                  console.log("res ", res);
+
+                  let balance = parseFloat(res[0]);
+
+                  [...res[1], ...res[2], ...res[3]].forEach((transaction) => {
+                    const filteredTrades = trades.filter(
+                      (trade) => parseInt(trade.entry_time) < transaction.time
+                    );
+                    const latestTrade = filteredTrades.reduce(
+                      (maxTrade, currentTrade) => {
+                        return parseInt(currentTrade.entry_time) >
+                          parseInt(maxTrade.entry_time)
+                          ? currentTrade
+                          : maxTrade;
+                      },
+                      filteredTrades[0]
+                    );
+
+                    if (latestTrade) {
+                      latestTrade.transfer += parseFloat(transaction.income);
                     }
                   });
+
+                  fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/trades`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(
+                      trades.map((p) => {
+                        balance -= p.profit + p.transfer;
+
+                        delete p.transfer;
+
+                        return {
+                          ...p,
+                          deposit: Math.max(0, parseInt(balance.toFixed())),
+                        };
+                      })
+                    ),
+                  })
+                    .then((res) => res.json())
+                    .then((b) => {
+                      if (b === null) {
+                        createNotification(
+                          user.id,
+                          `Binance Futures: произошла ошибка при сохранении сделок по API-ключу «${k.title}». Попробуйте перезагрузить ключ или обратиться в поддержку.`,
+                          "/svg/error_load.svg"
+                        ).then((n) => {
+                          setNotifications((prev) => [n, ...prev]);
+                        });
+                      } else {
+                        createNotification(
+                          user.id,
+                          `Binance Futures: загружены сделки (${b.count}) по API-ключу «${k.title}».`,
+                          "/svg/success_load.svg"
+                        ).then((n) => {
+                          setNotifications((prev) => [n, ...prev]);
+                        });
+                      }
+                    });
+                });
+              })
+              .catch((error) => {
+                fetch(
+                  `${process.env.NEXT_PUBLIC_BACKEND_URL}/notifications?text=${
+                    "Binance Futures: получена ошибка при загрузке сделок: " +
+                    error.response.data?.msg
+                  }&secretkey=${secretkey}&imageUrl=${"/svg/error_load.svg"}`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "X-TRADIFY-UID": user.id,
+                    },
+                  }
+                )
+                  .then((res) => res.json())
+                  .then((n) => {
+                    setNotifications((prev) => [n, ...prev]);
+                  });
               });
-            })
-            .catch((error) => {
-              createNotification(
-                user.id,
-                "Binance Futures: получена ошибка при загрузке сделок: " +
-                  error.response.data?.msg,
-                "/svg/error_load.svg"
-              ).then((n) => {
-                setNotifications((prev) => [n, ...prev]);
-              });
-            });
-        });
+          });
         break;
 
       case "Bybit Linear Futures":
